@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+</head>
+<body>
+<video id="video" width="300" height="300"></video>
+<button onclick="openvideo()">打开摄像头</button>
+<canvas id="canvas" width="300" height="300"></canvas>
+<button onclick="getPic()">拍照</button>
+<input type="file" id="file"/>
+<br/>
+<button onclick="uploadface()">上传文件</button><br/>
+<img src=""  id="img"/>
+<script>
+    function openvideo(){
+        /*获取前端的视频标签*/
+        video=document.getElementById("video")
+        /*定义一个video设备的字典,显示宽高*/
+        cons={
+            video:{width:300,height:300}
+        }
+        /*navigator导航的对象,它可以找到一些硬件mediaDevices,*/
+        /*getUserMedia取出video摄像头这个设备*/
+        pros=navigator.mediaDevices.getUserMedia(cons)
+        /*取出后做的内容,用then来接,把内容放在res参数中,与video进行关联*/
+        pros.then(function(res){
+            video.srcObject=res
+            video.play()
+        })
+
+    }
+    function uploadface(){
+        /*获取上传文件的元素,获取文件的相关信息*/
+        file=document.getElementById("file").files[0]
+        console.log(file)
+        /*定义javascript读文件的函数*/
+        reader=new FileReader()
+        /*readAsDataURL把读取的内容变成数据*/
+        reader.readAsDataURL(file)
+        /*onloadend是读取结束*/
+        reader.onloadend=function(){
+            /*reader的result内容中接收结果*/
+            res=reader.result
+            res=res.substring(22)
+            $.post("/cut",{"myimg":res},function(res){
+                console.log(res)
+                $("#img").attr("src","data:image/png;base64,"+res["result"])
+            })
+        }
+    }
+    function getPic(){
+         /*获取前端的视频标签和画布的标签*/
+        video=document.getElementById("video")
+        canvas=document.getElementById("canvas")
+        /*用canvas画图,画的是平面的2d图形*/
+        ctx=canvas.getContext("2d")
+        /*调用canvas画布当中的drawImage画图函数*/
+        /*drawImage四个参数:画图位置和宽高*/
+        /*画的目标是视频中的内容*/
+        ctx.drawImage(video,0,0,300,300)
+        /*ajax只能上传的是数据,不是图片,只能把图片转成数据*/
+        /*toDataURL把canvas画的图片变成数据*/
+        data=canvas.toDataURL("image/png",0.5)
+        console.log(data)
+        /*下面一句代码的意思,这个canvas转成的data数据前面的22位只是编码格式,不是图片数据*/
+        data=data.substring(22)
+        /*图片数据只能post方式来提交*/
+        $.post("/cut",{"myimg":data},function(res){
+            console.log("data:image/png;base64,"+res["result"])
+            document.getElementById("img").src="data:image/png;base64,"+res["result"]
+        })
+    }
+</script>
+</body>
+</html>

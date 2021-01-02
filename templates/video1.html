@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    	<meta charset="UTF-8">
+    	<title>Title</title>
+    	<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+	<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/css/bootstrap.css" rel="stylesheet">
+	<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/3.0.1/js/bootstrap.js"></script>
+	<style>
+		video,canvas{
+			border:2px solid blue
+		}
+	
+	</style>
+</head>
+<body>
+<header class="col-xs-12 navbar navbar-default">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="#">
+			flask图书系统登陆界面
+		</a>
+	</div>
+</header>
+<main div="col-xs-12">
+	<div class="col-xs-6">
+		<video id="video" width="100%" height="400"></video>
+	</div>
+	<div class="col-xs-6">
+		<canvas id="canvas" width="100%" height="400"></canvas>
+	</div>
+	<div class="col-xs-6">
+		<button onclick="openvideo()" class="btn btn-primary">打开摄像头</button>
+	</div>
+	<div class="col-xs-6">
+		<button onclick="getPic()" class="btn btn-primary">拍照</button>
+	</div>
+</main>
+<script>
+    $("#canvas").width($("#video").width())
+    $("#canvas").height($("#video").height())
+    function openvideo(){
+        /*获取前端的视频标签*/
+        video=document.getElementById("video")
+        /*定义一个video设备的字典,显示宽高*/
+        cons={
+            video:{width:video.width,height:video.height}
+        }
+        /*navigator导航的对象,它可以找到一些硬件mediaDevices,*/
+        /*getUserMedia取出video摄像头这个设备*/
+        pros=navigator.mediaDevices.getUserMedia(cons)
+        /*取出后做的内容,用then来接,把内容放在res参数中,与video进行关联*/
+        pros.then(function(res){
+            video.srcObject=res
+            video.play()
+        })
+
+    }
+    function getPic(){
+         /*获取前端的视频标签和画布的标签*/
+        video=document.getElementById("video")
+        canvas=document.getElementById("canvas")
+        /*用canvas画图,画的是平面的2d图形*/
+        ctx=canvas.getContext("2d")
+        /*调用canvas画布当中的drawImage画图函数*/
+        /*drawImage四个参数:画图位置和宽高*/
+        /*画的目标是视频中的内容*/
+        ctx.drawImage(video,0,0,video.width,video.height)
+    }
+</script>
+</body>
+</html>
